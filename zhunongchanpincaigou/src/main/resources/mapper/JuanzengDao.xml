@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JuanzengDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.juanzeng_name as juanzengName
+        ,a.juanzeng_photo as juanzengPhoto
+        ,a.juanzeng_types as juanzengTypes
+        ,a.juanzeng_new_money as juanzengNewMoney
+        ,a.juanzeng_content as juanzengContent
+        ,a.juanzeng_delete as juanzengDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JuanzengView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM juanzeng  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.juanzengName != '' and params.juanzengName != null and params.juanzengName != 'null' ">
+                and a.juanzeng_name like CONCAT('%',#{params.juanzengName},'%')
+            </if>
+            <if test="params.juanzengTypes != null and params.juanzengTypes != ''">
+                and a.juanzeng_types = #{params.juanzengTypes}
+            </if>
+            <if test="params.juanzengNewMoneyStart != null ">
+                <![CDATA[  and a.juanzeng_new_money >= #{params.juanzengNewMoneyStart}   ]]>
+            </if>
+            <if test="params.juanzengNewMoneyEnd != null ">
+                <![CDATA[  and a.juanzeng_new_money <= #{params.juanzengNewMoneyEnd}   ]]>
+            </if>
+            <if test=" params.juanzengContent != '' and params.juanzengContent != null and params.juanzengContent != 'null' ">
+                and a.juanzeng_content like CONCAT('%',#{params.juanzengContent},'%')
+            </if>
+            <if test="params.juanzengDeleteStart != null and params.juanzengDeleteStart != ''">
+                <![CDATA[  and a.juanzeng_delete >= #{params.juanzengDeleteStart}   ]]>
+            </if>
+            <if test="params.juanzengDeleteEnd != null and params.juanzengDeleteEnd != ''">
+                <![CDATA[  and a.juanzeng_delete <= #{params.juanzengDeleteEnd}   ]]>
+            </if>
+             <if test="params.juanzengDelete != null and params.juanzengDelete != ''">
+                and a.juanzeng_delete = #{params.juanzengDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

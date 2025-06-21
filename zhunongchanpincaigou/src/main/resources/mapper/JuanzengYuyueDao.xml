@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JuanzengYuyueDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.juanzeng_id as juanzengId
+        ,a.yonghu_id as yonghuId
+        ,a.juanzeng_new_money as juanzengNewMoney
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JuanzengYuyueView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,juanzeng.juanzeng_name as juanzengName
+        ,juanzeng.juanzeng_photo as juanzengPhoto
+        ,juanzeng.juanzeng_types as juanzengTypes
+        ,juanzeng.juanzeng_new_money as juanzengNewMoney
+        ,juanzeng.juanzeng_content as juanzengContent
+        ,juanzeng.juanzeng_delete as juanzengDelete
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+        ,yonghu.yonghu_sum_jifen as yonghuSumJifen
+        ,yonghu.yonghu_new_jifen as yonghuNewJifen
+        ,yonghu.huiyuandengji_types as huiyuandengjiTypes
+
+        FROM juanzeng_yuyue  a
+        left JOIN juanzeng juanzeng ON a.juanzeng_id = juanzeng.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.juanzengId != null and params.juanzengId != ''">
+                and (
+                    a.juanzeng_id = #{params.juanzengId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.juanzengNewMoneyStart != null ">
+                <![CDATA[  and a.juanzeng_new_money >= #{params.juanzengNewMoneyStart}   ]]>
+            </if>
+            <if test="params.juanzengNewMoneyEnd != null ">
+                <![CDATA[  and a.juanzeng_new_money <= #{params.juanzengNewMoneyEnd}   ]]>
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断捐赠项目的id不为空 -->
+            <if test=" params.juanzengIdNotNull != '' and params.juanzengIdNotNull != null and params.juanzengIdNotNull != 'null' ">
+                and a.juanzeng_id IS NOT NULL
+            </if>
+            <if test=" params.juanzengName != '' and params.juanzengName != null and params.juanzengName != 'null' ">
+                and juanzeng.juanzeng_name like CONCAT('%',#{params.juanzengName},'%')
+            </if>
+            <if test="params.juanzengTypes != null  and params.juanzengTypes != ''">
+                and juanzeng.juanzeng_types = #{params.juanzengTypes}
+            </if>
+
+            <if test="params.juanzengNewMoneyStart != null ">
+                <![CDATA[  and juanzeng.juanzeng_new_money >= #{params.juanzengNewMoneyStart}   ]]>
+            </if>
+            <if test="params.juanzengNewMoneyEnd != null ">
+                <![CDATA[  and juanzeng.juanzeng_new_money <= #{params.juanzengNewMoneyEnd}   ]]>
+            </if>
+            <if test=" params.juanzengContent != '' and params.juanzengContent != null and params.juanzengContent != 'null' ">
+                and juanzeng.juanzeng_content like CONCAT('%',#{params.juanzengContent},'%')
+            </if>
+            <if test="params.juanzengDeleteStart != null  and params.juanzengDeleteStart != '' ">
+                <![CDATA[  and juanzeng.juanzeng_delete >= #{params.juanzengDeleteStart}   ]]>
+            </if>
+            <if test="params.juanzengDeleteEnd != null  and params.juanzengDeleteEnd != '' ">
+                <![CDATA[  and juanzeng.juanzeng_delete <= #{params.juanzengDeleteEnd}   ]]>
+            </if>
+            <if test="params.juanzengDelete != null  and params.juanzengDelete != '' ">
+                and juanzeng.juanzeng_delete = #{params.juanzengDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(juanzeng.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(juanzeng.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.yonghuSumJifenStart != null ">
+                <![CDATA[  and yonghu.yonghu_sum_jifen >= #{params.yonghuSumJifenStart}   ]]>
+            </if>
+            <if test="params.yonghuSumJifenEnd != null ">
+                <![CDATA[  and yonghu.yonghu_sum_jifen <= #{params.yonghuSumJifenEnd}   ]]>
+            </if>
+            <if test="params.yonghuNewJifenStart != null ">
+                <![CDATA[  and yonghu.yonghu_new_jifen >= #{params.yonghuNewJifenStart}   ]]>
+            </if>
+            <if test="params.yonghuNewJifenEnd != null ">
+                <![CDATA[  and yonghu.yonghu_new_jifen <= #{params.yonghuNewJifenEnd}   ]]>
+            </if>
+            <if test="params.huiyuandengjiTypes != null  and params.huiyuandengjiTypes != ''">
+                and yonghu.huiyuandengji_types = #{params.huiyuandengjiTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
